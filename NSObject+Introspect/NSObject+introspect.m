@@ -37,6 +37,23 @@
     
     free(properties);
     
+    objc_property_t *superProperties = class_copyPropertyList([self superclass], &outCount);
+    
+    for(int i = 0; i < outCount; i++) {
+        objc_property_t property = superProperties[i];
+        const char *propName = property_getName(property);
+        NSString *propertyNameString = [NSString stringWithUTF8String:propName];
+        NSValue *propertyValue = [self valueForKey:propertyNameString];
+        if (propertyValue){
+            [dict setValue:propertyValue forKey:propertyNameString];
+        }
+        else {
+            [dict setObject:[NSNull null] forKey:propertyNameString];
+        }
+    }
+    
+    free(superProperties);
+    
     return dict;
 }
 
